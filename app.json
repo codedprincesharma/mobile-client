@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "mobile-client",
-    "slug": "mobile-client",
+    "slug": "test",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -43,6 +43,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5f4c0809-e80d-47ed-a492-3cd9d1a1f161"
+      }
+    },
+    "owner": "codedprincesharmas-organization"
   }
 }
