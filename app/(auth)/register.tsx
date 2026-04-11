@@ -57,7 +57,7 @@ export default function RegisterScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Image source={Images.logo} style={styles.logo} />
-          <Text style={styles.brandName}>QuickShop</Text>
+          <Text style={styles.brandName}>GRIHGO</Text>
         </View>
 
         <View style={styles.formCard}>

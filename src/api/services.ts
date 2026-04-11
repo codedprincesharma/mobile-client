@@ -20,8 +20,9 @@ export const updateProfile = async (data: any) => {
   return response.data;
 };
 
-export const fetchProducts = async () => {
-  const response = await api.get('/products');
+export const fetchProducts = async (query?: string) => {
+  const url = query ? `/products?search=${encodeURIComponent(query)}` : '/products';
+  const response = await api.get(url);
   return response.data;
 };
 

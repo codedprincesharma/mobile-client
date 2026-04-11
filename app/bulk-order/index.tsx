@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, SafeAreaView, StatusBar, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { createBulkOrder } from '../../src/api/services';
+import { Ionicons } from '@expo/vector-icons';
+import { FontFamily } from '../../constants/theme';
+
+const theme = {
+  primary: '#008e42',
+  topBg: '#e9f5ed',
+  surface: '#ffffff',
+  surfaceLow: '#f4f6f5',
+  onSurface: '#1a1d1e',
+  onSurfaceVariant: '#6e7774',
+};
 
 export default function BulkOrderScreen() {
   const router = useRouter();
@@ -48,67 +59,129 @@ export default function BulkOrderScreen() {
     }
   };
 
+  const InputField = ({ label, value, onChangeText, placeholder, keyboardType = 'default', multiline = false }: any) => (
+    <View style={styles.inputWrapper}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput 
+        style={[styles.input, multiline && styles.textArea]} 
+        value={value} 
+        onChangeText={onChangeText} 
+        placeholder={placeholder}
+        placeholderTextColor="#bcc3c0"
+        keyboardType={keyboardType}
+        multiline={multiline}
+        numberOfLines={multiline ? 4 : 1}
+      />
+    </View>
+  );
+
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor={theme.topBg} />
+      
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backButton}>← Back</Text>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <Ionicons name="arrow-back" size={24} color={theme.onSurface} />
         </TouchableOpacity>
-        <Text style={styles.title}>Bulk Order Request</Text>
-      </View>
-
-      <View style={styles.formContainer}>
-        <Text style={styles.description}>
-          Looking to order in large volumes? Fill out the form below and our sales team will get back to you with a custom quote.
-        </Text>
-
-        <Text style={styles.label}>Event Type * (e.g., Wedding, Birthday)</Text>
-        <TextInput style={styles.input} value={formData.eventType} onChangeText={(text) => setFormData({...formData, eventType: text})} />
-
-        <Text style={styles.label}>Event Date * (YYYY-MM-DD)</Text>
-        <TextInput style={styles.input} value={formData.eventDate} onChangeText={(text) => setFormData({...formData, eventDate: text})} placeholder="2026-12-01" />
-
-        <Text style={styles.label}>Delivery Date * (YYYY-MM-DD)</Text>
-        <TextInput style={styles.input} value={formData.deliveryDate} onChangeText={(text) => setFormData({...formData, deliveryDate: text})} placeholder="2026-11-28" />
-
-        <Text style={styles.label}>Delivery Address *</Text>
-        <TextInput style={styles.input} value={formData.deliveryAddress} onChangeText={(text) => setFormData({...formData, deliveryAddress: text})} />
-
-        <Text style={styles.label}>Estimated Guest Count *</Text>
-        <TextInput style={styles.input} value={formData.guestCount} onChangeText={(text) => setFormData({...formData, guestCount: text})} keyboardType="numeric" />
-
-        <Text style={styles.label}>Package Type (small, medium, wedding, custom)</Text>
-        <TextInput style={styles.input} value={formData.packageType} onChangeText={(text) => setFormData({...formData, packageType: text.toLowerCase()})} />
-
-        <Text style={styles.label}>Items / SKUs (comma separated)</Text>
-        <TextInput style={styles.textArea} value={formData.itemList} onChangeText={(text) => setFormData({...formData, itemList: text})} multiline numberOfLines={3} placeholder="Cake, 50 Samosas, Drinks..." />
-
-        <Text style={styles.label}>Special Notes</Text>
-        <TextInput style={styles.textArea} value={formData.specialNote} onChangeText={(text) => setFormData({...formData, specialNote: text})} multiline numberOfLines={3} />
-
-        <TouchableOpacity 
-          style={[styles.submitButton, loading && styles.disabledButton]} 
-          onPress={handleSubmit}
-          disabled={loading}
-        >
-          <Text style={styles.submitText}>{loading ? 'Submitting...' : 'Submit Request'}</Text>
+        <Text style={styles.title}>Bulk Request</Text>
+        <TouchableOpacity onPress={() => router.push('/bulk-order/my-orders' as any)} style={styles.historyBtn}>
+           <Ionicons name="list" size={22} color={theme.primary} />
         </TouchableOpacity>
       </View>
-    </ScrollView>
+
+      <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+          
+          <View style={styles.heroCard}>
+             <View style={styles.heroIconBubble}>
+                <Ionicons name="cube" size={32} color={theme.primary} />
+             </View>
+             <Text style={styles.heroTitle}>Planning a big event?</Text>
+             <Text style={styles.heroDesc}>
+               Fill out the form below and our sales team will get back to you with a custom quote tailored to your needs.
+             </Text>
+          </View>
+
+          <View style={styles.formCard}>
+            <Text style={styles.sectionTitle}>Event Details</Text>
+            
+            <InputField label="Event Type *" value={formData.eventType} onChangeText={(text: string) => setFormData({...formData, eventType: text})} placeholder="e.g., Wedding, Corporate" />
+            
+            <View style={styles.row}>
+               <View style={styles.flexHalf}>
+                  <InputField label="Event Date *" value={formData.eventDate} onChangeText={(text: string) => setFormData({...formData, eventDate: text})} placeholder="YYYY-MM-DD" />
+               </View>
+               <View style={styles.flexHalf}>
+                  <InputField label="Delivery Date *" value={formData.deliveryDate} onChangeText={(text: string) => setFormData({...formData, deliveryDate: text})} placeholder="YYYY-MM-DD" />
+               </View>
+            </View>
+
+            <InputField label="Guest Count *" value={formData.guestCount} onChangeText={(text: string) => setFormData({...formData, guestCount: text})} placeholder="e.g., 500" keyboardType="numeric" />
+            
+            <InputField label="Delivery Address *" value={formData.deliveryAddress} onChangeText={(text: string) => setFormData({...formData, deliveryAddress: text})} placeholder="Full delivery address" />
+          </View>
+
+          <View style={styles.formCard}>
+            <Text style={styles.sectionTitle}>Order Requirements</Text>
+
+            <InputField label="Package Type" value={formData.packageType} onChangeText={(text: string) => setFormData({...formData, packageType: text.toLowerCase()})} placeholder="Small, Medium, Custom" />
+            
+            <InputField label="Items / SKUs" value={formData.itemList} onChangeText={(text: string) => setFormData({...formData, itemList: text})} placeholder="Cake, 50 Samosas, Drinks..." multiline />
+            
+            <InputField label="Special Notes" value={formData.specialNote} onChangeText={(text: string) => setFormData({...formData, specialNote: text})} placeholder="Any special dietary requirements or delivery instructions?" multiline />
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.submitButton, loading && styles.disabledButton]} 
+            onPress={handleSubmit}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Submit Request</Text>}
+          </TouchableOpacity>
+
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  header: { padding: 20, paddingTop: 60, backgroundColor: '#f5f5f5', borderBottomWidth: 1, borderBottomColor: '#eee' },
-  backButton: { fontSize: 16, color: '#007AFF', marginBottom: 10 },
-  title: { fontSize: 28, fontWeight: 'bold' },
-  formContainer: { padding: 20, paddingBottom: 50 },
-  description: { fontSize: 16, color: '#666', lineHeight: 24, marginBottom: 30 },
-  label: { fontSize: 16, fontWeight: 'bold', color: '#444', marginBottom: 8 },
-  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 15, fontSize: 16, marginBottom: 20, backgroundColor: '#fafafa' },
-  textArea: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 15, fontSize: 16, marginBottom: 20, backgroundColor: '#fafafa', textAlignVertical: 'top', height: 100 },
-  submitButton: { backgroundColor: '#007AFF', padding: 18, borderRadius: 8, alignItems: 'center', marginTop: 10 },
-  disabledButton: { backgroundColor: '#99cfeb' },
-  submitText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  safeArea: { flex: 1, backgroundColor: theme.surfaceLow },
+  
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between', 
+    paddingHorizontal: 15, 
+    paddingTop: 15, 
+    paddingBottom: 20, 
+    backgroundColor: theme.topBg 
+  },
+  backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-start' },
+  historyBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'flex-end' },
+  title: { fontSize: 18, fontFamily: FontFamily.bold, color: theme.onSurface },
+  
+  container: { flex: 1 },
+  scrollContent: { padding: 15, paddingBottom: 40 },
+  
+  heroCard: { backgroundColor: theme.topBg, padding: 25, borderRadius: 20, alignItems: 'center', marginBottom: 20 },
+  heroIconBubble: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginBottom: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 4 },
+  heroTitle: { fontSize: 20, fontFamily: FontFamily.extraBold, color: '#000', marginBottom: 8 },
+  heroDesc: { fontSize: 13, fontFamily: FontFamily.medium, color: theme.onSurfaceVariant, textAlign: 'center', lineHeight: 20 },
+
+  formCard: { backgroundColor: '#fff', borderRadius: 20, padding: 20, marginBottom: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.02, shadowRadius: 8, elevation: 2 },
+  sectionTitle: { fontSize: 16, fontFamily: FontFamily.bold, color: '#000', marginBottom: 20 },
+  
+  row: { flexDirection: 'row', gap: 15 },
+  flexHalf: { flex: 1 },
+  
+  inputWrapper: { marginBottom: 15 },
+  label: { fontSize: 12, fontFamily: FontFamily.bold, color: theme.onSurfaceVariant, marginBottom: 6, marginLeft: 2 },
+  input: { backgroundColor: theme.surfaceLow, borderWidth: 1, borderColor: '#e1e5e3', borderRadius: 12, padding: 14, fontSize: 14, fontFamily: FontFamily.medium, color: theme.onSurface },
+  textArea: { height: 100, textAlignVertical: 'top' },
+  
+  submitButton: { backgroundColor: theme.primary, paddingVertical: 18, borderRadius: 16, alignItems: 'center', marginTop: 10, shadowColor: theme.primary, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.25, shadowRadius: 10, elevation: 5 },
+  disabledButton: { backgroundColor: '#80c7a1' },
+  submitText: { color: '#fff', fontSize: 16, fontFamily: FontFamily.bold },
 });

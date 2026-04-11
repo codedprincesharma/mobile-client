@@ -1,209 +1,359 @@
-import React from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, Dimensions, ScrollView, SafeAreaView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useCart } from '../../src/context/CartContext';
-import { Products as ProductImages, Icons } from '../../constants/Assets';
-import { Colors, FontFamily } from '../../constants/theme';
+import { Products as ProductImages } from '../../constants/Assets';
+import { FontFamily } from '../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
+
+const theme = {
+  primary: '#008e42',
+  topBg: '#00a350',
+  surface: '#ffffff',
+  surfaceLow: '#f9f9f9',
+  onSurface: '#1a1d1e',
+  onSurfaceVariant: '#6e7774',
+};
 
 export default function CartScreen() {
   const { items, removeFromCart, updateQuantity, totalPrice } = useCart();
   const router = useRouter();
+  const [selectedTime, setSelectedTime] = useState('15');
 
   if (items.length === 0) {
     return (
       <View style={styles.center}>
-        <Image source={Icons.bucket} style={styles.emptyIcon} />
+        <Ionicons name="cart-outline" size={80} color={theme.onSurfaceVariant} />
         <Text style={styles.emptyText}>Your cart is empty</Text>
         <TouchableOpacity style={styles.browseButton} onPress={() => router.push('/(tabs)')}>
-          <Text style={styles.browseText}>Browse Products</Text>
+          <Text style={styles.browseText}>Start Shopping</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
+  const shippingFee = 0.00; // Free shipping in reference
+  const grandTotal = totalPrice + shippingFee;
+
   return (
     <View style={styles.container}>
+      {/* Green Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Shopping Cart</Text>
-        <Text style={styles.itemCount}>{items.length} Items</Text>
-      </View>
-      
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.product._id}
-        contentContainerStyle={styles.listContent}
-        renderItem={({ item, index }) => (
-          <View style={styles.cartItem}>
-            <Image 
-              source={ProductImages[`p${(index % 16) + 1}` as keyof typeof ProductImages]} 
-              style={styles.itemImage} 
-            />
-            <View style={styles.itemDetails}>
-              <View style={styles.itemHeader}>
-                <Text style={styles.itemName} numberOfLines={1}>{item.product.name}</Text>
-                <TouchableOpacity onPress={() => removeFromCart(item.product._id)}>
-                  <Text style={styles.removeText}>✕</Text>
-                </TouchableOpacity>
-              </View>
-              
-              <Text style={styles.itemPrice}>₹{item.product.price}</Text>
-              
-              <View style={styles.quantityRow}>
-                <View style={styles.quantityControls}>
-                  <TouchableOpacity
-                    style={styles.quantityBtn}
-                    onPress={() => updateQuantity(item.product._id, Math.max(1, item.quantity - 1))}
-                  >
-                    <Text style={styles.quantityBtnText}>-</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.quantity}>{item.quantity}</Text>
-                  <TouchableOpacity
-                    style={styles.quantityBtn}
-                    onPress={() => updateQuantity(item.product._id, item.quantity + 1)}
-                  >
-                    <Text style={styles.quantityBtnText}>+</Text>
-                  </TouchableOpacity>
-                </View>
-                <Text style={styles.subtotal}>₹{(item.product.price * item.quantity).toFixed(2)}</Text>
-              </View>
-            </View>
-          </View>
-        )}
-      />
-
-      <View style={styles.footer}>
-        <View style={styles.promoBox}>
-          <Image source={Icons.coupon} style={styles.promoIcon} />
-          <Text style={styles.promoText}>Apply Coupon Code</Text>
-          <Text style={styles.promoArrow}>›</Text>
-        </View>
-
-        <View style={styles.billContainer}>
-          <View style={styles.billRow}>
-            <Text style={styles.billLabel}>Item Total</Text>
-            <Text style={styles.billValue}>₹{totalPrice.toFixed(2)}</Text>
-          </View>
-          <View style={styles.billRow}>
-            <Text style={styles.billLabel}>Delivery Fee</Text>
-            <Text style={styles.billValueFree}>FREE</Text>
-          </View>
-          <View style={[styles.billRow, styles.totalRow]}>
-            <Text style={styles.totalLabel}>Grand Total</Text>
-            <Text style={styles.totalValue}>₹{totalPrice.toFixed(2)}</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity style={styles.checkoutBtn} onPress={() => router.push('/checkout')}>
-          <Text style={styles.checkoutText}>Proceed to Checkout</Text>
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.push('/(tabs)')}>
+           <Ionicons name="chevron-back" size={28} color="#ffffff" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Checkout</Text>
+        <TouchableOpacity style={styles.headerRightBtn}>
+           <Ionicons name="cart-outline" size={24} color="#ffffff" />
         </TouchableOpacity>
       </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        
+        {/* Cart Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Cart</Text>
+          
+          <View style={styles.itemsContainer}>
+            {items.map((item, index) => {
+              // Local vs Remote Image handling
+              let productImage: any = null;
+              if (ProductImages && (ProductImages as any)[`p${(index % 16) + 1}`]) {
+                productImage = (ProductImages as any)[`p${(index % 16) + 1}`];
+              } else {
+                productImage = { uri: item.product.images?.[0] || 'https://via.placeholder.com/150' };
+              }
+
+              return (
+                <View key={item.product._id} style={styles.cartItem}>
+                  <View style={styles.itemImageContainer}>
+                    <Image source={productImage} style={styles.itemImage} />
+                  </View>
+                  
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName} numberOfLines={1}>{item.product.name}</Text>
+                    <Text style={styles.itemPrice}>${item.product.price}</Text>
+                  </View>
+
+                  <View style={styles.itemRightCol}>
+                     <Text style={styles.itemTotalPrice}>${(item.product.price * item.quantity).toFixed(2)}</Text>
+                     
+                     <View style={styles.quantityControls}>
+                        <TouchableOpacity 
+                          style={styles.qtyBtn}
+                          onPress={() => {
+                            if (item.quantity === 1) removeFromCart(item.product._id);
+                            else updateQuantity(item.product._id, item.quantity - 1);
+                          }}
+                        >
+                          <Ionicons name="remove" size={16} color="#aaa" />
+                        </TouchableOpacity>
+                        
+                        <Text style={styles.qtyText}>{item.quantity}</Text>
+                        
+                        <TouchableOpacity 
+                          style={styles.qtyBtnAdd}
+                          onPress={() => updateQuantity(item.product._id, item.quantity + 1)}
+                        >
+                          <Ionicons name="add" size={16} color="#fff" />
+                        </TouchableOpacity>
+                     </View>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Bill Summary */}
+        <View style={styles.billContainer}>
+          <View style={styles.billRow}>
+            <Text style={styles.billLabel}>Subtotal</Text>
+            <Text style={styles.billValue}>${totalPrice.toFixed(2)}</Text>
+          </View>
+          <View style={styles.billRow}>
+            <Text style={styles.billLabel}>Shipping fee</Text>
+            <Text style={styles.billValue}>${shippingFee.toFixed(2)}</Text>
+          </View>
+          
+          <View style={styles.billDivider} />
+          
+          <View style={styles.billRow}>
+            <Text style={styles.billTotalLabel}>Total</Text>
+            <Text style={styles.billTotalValue}>${grandTotal.toFixed(2)}</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.mainPayBtn} activeOpacity={0.8}>
+           <Text style={styles.mainPayText}>Proceed to Pay</Text>
+        </TouchableOpacity>
+
+        {/* Delivery Time-slot */}
+        <View style={styles.timeSlotSection}>
+          <Text style={styles.sectionTitle}>Delivery Time-slot</Text>
+          <View style={styles.radioContainer}>
+             
+             <TouchableOpacity 
+               style={[styles.radioItem, selectedTime === '15' && styles.radioItemActive]}
+               onPress={() => setSelectedTime('15')}
+               activeOpacity={0.9}
+             >
+                <View style={styles.radioOuter}>
+                  {selectedTime === '15' && <View style={styles.radioInner} />}
+                </View>
+                <Text style={styles.radioText}>Delivery in 15 mins</Text>
+                {selectedTime === '15' && <Ionicons name="chevron-down" size={20} color={theme.onSurfaceVariant} style={{marginLeft: 'auto'}}/>}
+             </TouchableOpacity>
+
+             <TouchableOpacity 
+               style={[styles.radioItem, selectedTime === '3' && styles.radioItemActive]}
+               onPress={() => setSelectedTime('3')}
+               activeOpacity={0.9}
+             >
+                <View style={styles.radioOuter}>
+                  {selectedTime === '3' && <View style={styles.radioInner} />}
+                </View>
+                <Text style={styles.radioText}>Delivery in 3 mins</Text>
+             </TouchableOpacity>
+
+          </View>
+        </View>
+        
+        <TouchableOpacity style={styles.mainPayBtn} activeOpacity={0.8}>
+           <Text style={styles.mainPayText}>Proceed to Pay</Text>
+        </TouchableOpacity>
+
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20, backgroundColor: '#fff' },
-  emptyIcon: { width: 100, height: 100, marginBottom: 20, tintColor: '#ccc' },
-  emptyText: { fontSize: 18, color: '#666', marginBottom: 30, fontFamily: FontFamily.medium },
-  browseButton: { backgroundColor: Colors.light.tint, paddingVertical: 15, paddingHorizontal: 30, borderRadius: 12 },
-  browseText: { color: '#fff', fontSize: 16, fontFamily: FontFamily.bold },
-  
-  container: { flex: 1, backgroundColor: '#f9f9f9' },
-  header: { padding: 20, paddingTop: 60, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { fontSize: 24, fontFamily: FontFamily.extraBold, color: '#1c1c1c' },
-  itemCount: { fontSize: 14, color: '#888', fontFamily: FontFamily.medium },
-  
-  listContent: { padding: 20 },
-  cartItem: { 
-    flexDirection: 'row',
-    backgroundColor: '#fff', 
-    padding: 12, 
-    borderRadius: 15, 
-    marginBottom: 15, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.05, 
-    shadowRadius: 10, 
-    elevation: 2 
+  container: {
+    flex: 1,
+    backgroundColor: theme.surface,
   },
-  itemImage: { width: 90, height: 90, borderRadius: 10, marginRight: 15 },
-  itemDetails: { flex: 1, justifyContent: 'space-between' },
-  itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  itemName: { fontSize: 16, fontFamily: FontFamily.bold, color: '#1c1c1c', flex: 1, marginRight: 10 },
-  removeText: { fontSize: 18, color: '#ccc', padding: 2 },
-  itemPrice: { fontSize: 14, color: '#666', fontFamily: FontFamily.regular },
-  
-  quantityRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 },
-  quantityControls: { 
-    flexDirection: 'row', 
+  center: { 
+    flex: 1, 
     alignItems: 'center', 
-    backgroundColor: '#f5f5f5', 
-    borderRadius: 8,
-    padding: 4
-  },
-  quantityBtn: { 
-    width: 28, 
-    height: 28, 
-    borderRadius: 6, 
-    backgroundColor: '#fff', 
-    alignItems: 'center', 
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1
-  },
-  quantityBtnText: { fontSize: 18, fontWeight: 'bold', color: Colors.light.tint },
-  quantity: { fontSize: 16, marginHorizontal: 15, fontFamily: FontFamily.bold, color: '#1c1c1c' },
-  subtotal: { fontSize: 16, fontFamily: FontFamily.extraBold, color: '#1c1c1c' },
-  
-  footer: { 
-    backgroundColor: '#fff', 
+    justifyContent: 'center', 
     padding: 20, 
-    borderTopLeftRadius: 25, 
-    borderTopRightRadius: 25, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: -5 }, 
-    shadowOpacity: 0.05, 
-    shadowRadius: 10, 
-    elevation: 20 
+    backgroundColor: theme.surface 
   },
-  promoBox: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    backgroundColor: '#fff9fa', 
-    padding: 15, 
-    borderRadius: 12, 
-    borderWidth: 1, 
-    borderColor: '#ffebed',
-    marginBottom: 20
+  emptyText: { 
+    fontSize: 18, 
+    color: theme.onSurface, 
+    marginTop: 20,
+    marginBottom: 30, 
+    fontFamily: FontFamily.bold 
   },
-  promoIcon: { width: 24, height: 24, marginRight: 12 },
-  promoText: { flex: 1, fontSize: 14, fontFamily: FontFamily.bold, color: '#444' },
-  promoArrow: { fontSize: 20, color: Colors.light.tint },
-
-  billContainer: { marginBottom: 20 },
-  billRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  billLabel: { fontSize: 14, color: '#666', fontFamily: FontFamily.regular },
-  billValue: { fontSize: 14, color: '#1c1c1c', fontFamily: FontFamily.medium },
-  billValueFree: { fontSize: 14, color: '#2ecc71', fontFamily: FontFamily.bold },
-  totalRow: { marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
-  totalLabel: { fontSize: 18, fontFamily: FontFamily.extraBold, color: '#1c1c1c' },
-  totalValue: { fontSize: 18, fontFamily: FontFamily.extraBold, color: '#1c1c1c' },
-
-  checkoutBtn: { 
-    backgroundColor: Colors.light.tint, 
-    paddingVertical: 18, 
-    borderRadius: 15, 
+  browseButton: { 
+    backgroundColor: theme.primary, 
+    paddingVertical: 15, 
+    paddingHorizontal: 30, 
+    borderRadius: 30 
+  },
+  browseText: { 
+    color: '#fff', 
+    fontSize: 16, 
+    fontFamily: FontFamily.bold 
+  },
+  
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: Colors.light.tint,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5
+    justifyContent: 'space-between',
+    backgroundColor: theme.topBg,
+    paddingTop: Platform.OS === 'ios' ? 50 : 30, // SafeArea
+    paddingBottom: 20,
+    paddingHorizontal: 15,
   },
-  checkoutText: { color: '#fff', fontSize: 18, fontFamily: FontFamily.bold },
+  backBtn: { padding: 5, marginLeft: -5 },
+  headerTitle: {
+    fontSize: 20,
+    fontFamily: FontFamily.bold,
+    color: '#ffffff',
+  },
+  headerRightBtn: { padding: 5 },
+  
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 50,
+  },
+
+  section: { marginBottom: 25 },
+  sectionTitle: { fontSize: 18, fontFamily: FontFamily.bold, color: theme.onSurface, marginBottom: 15 },
+  
+  itemsContainer: { gap: 15 },
+  cartItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemImageContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: theme.surfaceLow,
+    marginRight: 15,
+    borderWidth: 1,
+    borderColor: '#eee',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  itemImage: {
+    width: '70%',
+    height: '70%',
+    resizeMode: 'contain',
+  },
+  itemDetails: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  itemName: {
+    fontSize: 15,
+    fontFamily: FontFamily.bold,
+    color: theme.onSurface,
+    marginBottom: 6,
+  },
+  itemPrice: {
+    fontSize: 14,
+    fontFamily: FontFamily.medium,
+    color: theme.onSurfaceVariant,
+  },
+  
+  itemRightCol: { alignItems: 'flex-end' },
+  itemTotalPrice: {
+    fontSize: 15,
+    fontFamily: FontFamily.bold,
+    color: theme.onSurface,
+    marginBottom: 10,
+  },
+  quantityControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.surfaceLow,
+    borderRadius: 20,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#eee'
+  },
+  qtyBtn: {
+    width: 24, height: 24,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  qtyBtnAdd: {
+    width: 24, height: 24,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: theme.primary,
+    borderRadius: 12
+  },
+  qtyText: {
+    fontSize: 14,
+    fontFamily: FontFamily.bold,
+    color: theme.onSurface,
+    marginHorizontal: 10,
+  },
+
+  billContainer: { marginBottom: 25 },
+  billRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  billLabel: { fontSize: 15, fontFamily: FontFamily.medium, color: theme.onSurfaceVariant },
+  billValue: { fontSize: 15, fontFamily: FontFamily.medium, color: theme.onSurface },
+  billDivider: { height: 1, backgroundColor: '#eee', marginVertical: 8 },
+  billTotalLabel: { fontSize: 18, fontFamily: FontFamily.bold, color: theme.onSurface },
+  billTotalValue: { fontSize: 18, fontFamily: FontFamily.bold, color: theme.onSurface },
+
+  mainPayBtn: {
+    backgroundColor: theme.primary,
+    height: 55,
+    borderRadius: 27.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 30,
+    shadowColor: theme.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 6
+  },
+  mainPayText: { color: '#fff', fontSize: 18, fontFamily: FontFamily.bold },
+
+  timeSlotSection: { marginBottom: 30 },
+  radioContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 16,
+    overflow: 'hidden'
+  },
+  radioItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  radioItemActive: {
+    backgroundColor: '#f7fdfa' // faint green
+  },
+  radioOuter: {
+    width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#ccc',
+    marginRight: 12, alignItems: 'center', justifyContent: 'center'
+  },
+  radioInner: {
+    width: 10, height: 10, borderRadius: 5, backgroundColor: theme.primary
+  },
+  radioText: {
+    fontSize: 15,
+    fontFamily: FontFamily.medium,
+    color: theme.onSurface,
+  }
 });

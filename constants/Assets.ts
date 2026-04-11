@@ -1,7 +1,7 @@
 export const Images = {
   cloud: require('../assets/images/cloud.png'),
   delivery_boy: require('../assets/images/delivery_boy.png'),
-  logo: require('../assets/images/logo.jpeg'),
+  logo: require('../assets/images/logo.png'),
 };
 
 export const Icons = {

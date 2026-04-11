@@ -8,15 +8,20 @@ import {
   ActivityIndicator, 
   Image,
   RefreshControl,
-  Alert
+  Alert,
+  useWindowDimensions,
+  StatusBar
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { adminGetStats } from '../../src/api/services';
 import { Colors, FontFamily } from '../../constants/theme';
 import { Icons } from '../../constants/Assets';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AdminDashboardScreen() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({
@@ -27,6 +32,15 @@ export default function AdminDashboardScreen() {
     pendingOrdersAddress: 0,
     bulkOrders: 0
   });
+
+  // Calculate card width responsively (max 2 columns on phones, 3-4 on large tablets)
+  const isTablet = width > 600;
+  const numColumns = isTablet ? 3 : 2;
+  const gap = 16;
+  const horizontalPadding = 20;
+  // total gap width = (numColumns - 1) * gap
+  const cardWidth = (width - (horizontalPadding * 2) - ((numColumns - 1) * gap)) / numColumns;
+
 
   useEffect(() => {
     loadStats();
@@ -51,190 +65,278 @@ export default function AdminDashboardScreen() {
     loadStats();
   };
 
-  const StatCard = ({ title, value, icon, color, onPress }: any) => (
-    <TouchableOpacity style={styles.statCard} onPress={onPress}>
-      <View style={[styles.iconContainer, { backgroundColor: color + '15' }]}>
-        <Image source={icon} style={[styles.statIcon, { tintColor: color }]} />
-      </View>
-      <View>
-        <Text style={styles.statValue}>{value}</Text>
+  const StatCard = ({ title, value, iconName, color, onPress, index }: any) => (
+    <Animated.View entering={FadeInDown.delay(index * 100).springify().damping(16)} style={{ width: cardWidth }}>
+      <TouchableOpacity 
+        style={[styles.statCard, { borderBottomColor: color, borderBottomWidth: 3 }]} 
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
+        <View style={styles.statHeader}>
+          <View style={[styles.iconBox, { backgroundColor: color + '15' }]}>
+            <Ionicons name={iconName} size={22} color={color} />
+          </View>
+        </View>
+        <Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit>{value}</Text>
         <Text style={styles.statTitle}>{title}</Text>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Animated.View>
   );
 
-  const ShortcutBtn = ({ title, icon, onPress }: any) => (
-    <TouchableOpacity style={styles.shortcutBtn} onPress={onPress}>
-      <Image source={icon} style={styles.shortcutIcon} />
-      <Text style={styles.shortcutText}>{title}</Text>
-    </TouchableOpacity>
+  const ShortcutPill = ({ title, iconName, onPress, delay }: any) => (
+    <Animated.View entering={FadeInUp.delay(delay).springify().damping(15)}>
+      <TouchableOpacity style={styles.shortcutPill} onPress={onPress} activeOpacity={0.7}>
+        <View style={styles.shortcutIconWrap}>
+           <Ionicons name={iconName} size={20} color="#333" />
+        </View>
+        <Text style={styles.shortcutText}>{title}</Text>
+        <Ionicons name="chevron-forward" size={18} color="#ccc" />
+      </TouchableOpacity>
+    </Animated.View>
   );
 
   if (loading && !refreshing) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={Colors.light.tint} />
-        <Text style={styles.loadingText}>Loading Dashboard...</Text>
+        <StatusBar barStyle="dark-content" backgroundColor="#fcfcfc" />
+        <ActivityIndicator size="large" color="#008e42" />
+        <Text style={styles.loadingText}>Awakening Dashboard...</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView 
-      style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-    >
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={styles.backText}>←</Text>
-        </TouchableOpacity>
-        <View>
-          <Text style={styles.welcome}>Admin Hub</Text>
-          <Text style={styles.subtext}>Manage your business overview</Text>
-        </View>
+    <View style={styles.wrapper}>
+      <StatusBar barStyle="light-content" backgroundColor="#0a3c22" />
+      
+      {/* Background overlapping header */}
+      <View style={styles.heroBackground}>
+         <View style={styles.headerInner}>
+           <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+             <Ionicons name="arrow-back" size={24} color="#fff" />
+           </TouchableOpacity>
+           <View style={{ flex: 1 }}>
+             <Text style={styles.welcomeTitle}>Admin Command</Text>
+             <Text style={styles.welcomeSubtext}>Business Overview</Text>
+           </View>
+           <TouchableOpacity style={styles.profileAvatar}>
+             <Ionicons name="person" size={20} color="#0a3c22" />
+           </TouchableOpacity>
+         </View>
       </View>
 
-      <View style={styles.statsGrid}>
-        <StatCard 
-          title="Revenue" 
-          value={`$${stats.totalRevenue.toFixed(2)}`} 
-          icon={Icons.bucket} 
-          color="#4CAF50" 
-        />
-        <StatCard 
-          title="Orders" 
-          value={stats.totalOrders} 
-          icon={Icons.clock} 
-          color="#2196F3" 
-          onPress={() => router.push('/admin/orders' as any)}
-        />
-        <StatCard 
-          title="Users" 
-          value={stats.totalUsers} 
-          icon={Icons.home} 
-          color="#FF9800" 
-          onPress={() => router.push('/admin/users' as any)}
-        />
-        <StatCard 
-          title="Bulk Requests" 
-          value={stats.bulkOrders} 
-          icon={Icons.delivery} 
-          color="#E91E63" 
-          onPress={() => router.push('/admin/bulk-orders' as any)}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Management Shortcuts</Text>
-        <View style={styles.shortcutsGrid}>
-          <ShortcutBtn 
-            title="Manage Products" 
-            icon={Icons.store} 
-            onPress={() => router.push('/admin/products' as any)} 
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />}
+      >
+        <View style={styles.statsLayout}>
+          <StatCard 
+            index={0}
+            title="Revenue" 
+            value={`$${stats.totalRevenue.toFixed(2)}`} 
+            iconName="cash-outline" 
+            color="#27ae60" 
           />
-          <ShortcutBtn 
-            title="Manage Categories" 
-            icon={Icons.bucket} // Using bucket as placeholder for category
-            onPress={() => router.push('/admin/categories' as any)} 
+          <StatCard 
+            index={1}
+            title="Live Orders" 
+            value={stats.totalOrders} 
+            iconName="time-outline" 
+            color="#2980b9" 
+            onPress={() => router.push('/admin/orders' as any)}
           />
-          <ShortcutBtn 
-            title="Track Orders" 
-            icon={Icons.my_pin} 
-            onPress={() => router.push('/admin/orders' as any)} 
+          <StatCard 
+            index={2}
+            title="Total Users" 
+            value={stats.totalUsers} 
+            iconName="people-outline" 
+            color="#f39c12" 
+            onPress={() => router.push('/admin/users' as any)}
           />
-          <ShortcutBtn 
-            title="Coupons & Offers" 
-            icon={Icons.coupon} 
-            onPress={() => Alert.alert('Coming Soon', 'Dynamic coupon management is under development.')} 
+          <StatCard 
+            index={3}
+            title="Bulk Requests" 
+            value={stats.bulkOrders} 
+            iconName="cube-outline" 
+            color="#8e44ad" 
+            onPress={() => router.push('/admin/bulk-orders' as any)}
           />
         </View>
-      </View>
 
-      <View style={styles.recentActivity}>
-        <Text style={styles.sectionTitle}>Business Insights</Text>
-        <View style={styles.insightCard}>
-          <Text style={styles.insightText}>
-            You have {stats.pendingOrdersAddress || 0} pending orders that need confirmation.
-          </Text>
-          <TouchableOpacity onPress={() => router.push('/admin/orders' as any)}>
-            <Text style={styles.actionLink}>View Orders →</Text>
-          </TouchableOpacity>
+        {/* Pending Activity Highlight */}
+        <Animated.View entering={FadeInDown.delay(400).springify().damping(15)} style={styles.insightSection}>
+           <View style={styles.insightCard}>
+             <View style={styles.insightIconBadge}>
+                <Ionicons name="alert-circle" size={24} color="#e74c3c" />
+             </View>
+             <View style={styles.insightTextCol}>
+               <Text style={styles.insightTitle}>Attention Needed</Text>
+               <Text style={styles.insightDesc}>You have {stats.pendingOrdersAddress || 0} pending orders awaiting manual confirmation.</Text>
+             </View>
+             <TouchableOpacity style={styles.insightActionBtn} onPress={() => router.push('/admin/orders' as any)}>
+               <Text style={styles.insightActionTxt}>Review</Text>
+             </TouchableOpacity>
+           </View>
+        </Animated.View>
+
+        {/* Quick Actions List */}
+        <View style={styles.actionsSection}>
+          <Text style={styles.sectionHeader}>Quick Actions</Text>
+          <View style={styles.pillContainer}>
+            <ShortcutPill 
+              delay={500}
+              title="Inventory & Products" 
+              iconName="cube" 
+              onPress={() => router.push('/admin/products' as any)} 
+            />
+            <ShortcutPill 
+              delay={600}
+              title="Store Categories" 
+              iconName="grid" 
+              onPress={() => router.push('/admin/categories' as any)} 
+            />
+            <ShortcutPill 
+              delay={700}
+              title="Order Logistics" 
+              iconName="map" 
+              onPress={() => router.push('/admin/orders' as any)} 
+            />
+            <ShortcutPill 
+              delay={800}
+              title="Promotions & Coupons" 
+              iconName="pricetags" 
+              onPress={() => Alert.alert('Coming Soon', 'Dynamic coupon management is under development.')} 
+            />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fcfcfc' },
-  header: { 
-    padding: 20, 
-    paddingTop: 60, 
-    flexDirection: 'row', 
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0'
+  wrapper: { flex: 1, backgroundColor: '#f5f7fa' },
+  heroBackground: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0,
+    height: 240,
+    backgroundColor: '#0a3c22', // Deep elegant green
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+    zIndex: 0
   },
-  backBtn: { marginRight: 15, padding: 5 },
-  backText: { fontSize: 24, fontWeight: 'bold', color: '#1c1c1c' },
-  welcome: { fontSize: 22, fontFamily: FontFamily.extraBold, color: '#1c1c1c' },
-  subtext: { fontSize: 13, color: '#888', fontFamily: FontFamily.regular },
-  statsGrid: { 
-    flexDirection: 'row', 
-    flexWrap: 'wrap', 
-    padding: 10, 
-    justifyContent: 'space-between' 
-  },
-  statCard: { 
-    backgroundColor: '#fff', 
-    width: '47%', 
-    padding: 15, 
-    borderRadius: 15, 
-    marginBottom: 15,
+  headerInner: {
+    paddingTop: 65,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  backBtn: {
+    width: 44, height: 44,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center', alignItems: 'center',
+    marginRight: 15
+  },
+  welcomeTitle: { fontSize: 24, fontFamily: FontFamily.extraBold, color: '#fff', letterSpacing: -0.5 },
+  welcomeSubtext: { fontSize: 13, fontFamily: FontFamily.medium, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
+  profileAvatar: {
+    width: 44, height: 44,
+    borderRadius: 22,
+    backgroundColor: '#fff',
+    justifyContent: 'center', alignItems: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10
+  },
+  scrollContent: {
+    paddingTop: 150, // Pushes overlapping content down over the hero bg
+    paddingHorizontal: 20,
+    paddingBottom: 40
+  },
+  statsLayout: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+    justifyContent: 'space-between',
+    marginBottom: 25
+  },
+  statCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 18,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.04,
+    shadowRadius: 15,
+    elevation: 3,
   },
-  iconContainer: { 
-    width: 40, 
-    height: 40, 
-    borderRadius: 10, 
-    justifyContent: 'center', 
+  statHeader: { marginBottom: 16, alignSelf: 'flex-start' },
+  iconBox: {
+    width: 48, height: 48,
+    borderRadius: 14,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  statValue: { fontSize: 24, fontFamily: FontFamily.extraBold, color: '#1a1d1e', marginBottom: 4, letterSpacing: -0.5 },
+  statTitle: { fontSize: 13, fontFamily: FontFamily.medium, color: '#888' },
+  
+  insightSection: { marginBottom: 25 },
+  insightCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 18,
+    flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 10
+    shadowColor: '#e74c3c',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 15,
+    elevation: 2,
+    borderWidth: 1, borderColor: '#fef0ef'
   },
-  statIcon: { width: 20, height: 20 },
-  statValue: { fontSize: 18, fontFamily: FontFamily.bold, color: '#1c1c1c' },
-  statTitle: { fontSize: 12, color: '#888', fontFamily: FontFamily.medium },
-  section: { padding: 20 },
-  sectionTitle: { fontSize: 18, fontFamily: FontFamily.bold, color: '#1c1c1c', marginBottom: 15 },
-  shortcutsGrid: { gap: 12 },
-  shortcutBtn: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    backgroundColor: '#fff', 
-    padding: 15, 
+  insightIconBadge: {
+    width: 46, height: 46,
+    borderRadius: 23,
+    backgroundColor: '#fef0ef',
+    justifyContent: 'center', alignItems: 'center',
+    marginRight: 15
+  },
+  insightTextCol: { flex: 1, paddingRight: 10 },
+  insightTitle: { fontSize: 15, fontFamily: FontFamily.bold, color: '#1a1d1e', marginBottom: 2 },
+  insightDesc: { fontSize: 12, fontFamily: FontFamily.medium, color: '#666', lineHeight: 18 },
+  insightActionBtn: {
+    backgroundColor: '#e74c3c',
+    paddingVertical: 10, paddingHorizontal: 16,
+    borderRadius: 12
+  },
+  insightActionTxt: { color: '#fff', fontSize: 13, fontFamily: FontFamily.bold },
+
+  actionsSection: { flex: 1 },
+  sectionHeader: { fontSize: 18, fontFamily: FontFamily.bold, color: '#1a1d1e', marginBottom: 15 },
+  pillContainer: { gap: 12 },
+  shortcutPill: {
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.02,
+    shadowRadius: 10,
+    elevation: 1
+  },
+  shortcutIconWrap: {
+    width: 40, height: 40,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#f0f0f0'
+    backgroundColor: '#f4f6f5',
+    justifyContent: 'center', alignItems: 'center',
+    marginRight: 16
   },
-  shortcutIcon: { width: 22, height: 22, marginRight: 15, tintColor: Colors.light.tint },
-  shortcutText: { fontSize: 15, fontFamily: FontFamily.medium, color: '#333' },
-  recentActivity: { padding: 20, paddingTop: 0 },
-  insightCard: { 
-    backgroundColor: Colors.light.tint + '10', 
-    padding: 20, 
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: Colors.light.tint + '20'
-  },
-  insightText: { fontSize: 14, color: '#555', fontFamily: FontFamily.medium, lineHeight: 20, marginBottom: 10 },
-  actionLink: { color: Colors.light.tint, fontSize: 14, fontFamily: FontFamily.bold },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { marginTop: 15, color: '#888', fontFamily: FontFamily.medium }
+  shortcutText: { flex: 1, fontSize: 16, fontFamily: FontFamily.bold, color: '#1a1d1e' },
+  
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f7fa' },
+  loadingText: { marginTop: 15, fontSize: 14, fontFamily: FontFamily.medium, color: '#666' }
 });
+
