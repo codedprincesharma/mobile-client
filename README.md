@@ -42,6 +42,17 @@ To learn more about developing your project with Expo, look at the following res
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
+## Google OAuth
+
+Create a local `.env` file in this folder and set platform-specific Google OAuth client IDs:
+
+- `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID` for Android app login
+- `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` for web login
+- `EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID` for Expo Go development login
+- Optional: `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` for iOS app login
+
+Your server must also allow the same IDs in `GOOGLE_CLIENT_IDS` so both web and app ID tokens are accepted.
+
 ## Join the community
 
 Join our community of developers creating universal apps.

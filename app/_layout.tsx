@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Redirect, useSegments, Slot } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CartProvider } from '../src/context/CartContext';
-import { SocketProvider } from '../src/context/SocketContext';
+import { fetchMe } from '../src/api/services';
 
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -33,7 +33,18 @@ export default function RootLayout() {
 
   const checkToken = async () => {
     const token = await AsyncStorage.getItem('token');
-    setIsAuthenticated(!!token);
+    if (!token) {
+      setIsAuthenticated(false);
+      return;
+    }
+
+    try {
+      await fetchMe();
+      setIsAuthenticated(true);
+    } catch {
+      await AsyncStorage.removeItem('token');
+      setIsAuthenticated(false);
+    }
   };
 
   if (!loaded || isAuthenticated === null) {
@@ -54,9 +65,7 @@ export default function RootLayout() {
 
   return (
     <CartProvider>
-      <SocketProvider>
-        <Slot />
-      </SocketProvider>
+      <Slot />
     </CartProvider>
   );
 }

@@ -190,19 +190,6 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.cardSection}>
-           <View style={[styles.listItem, { borderBottomWidth: 0 }]}>
-              <View style={styles.listItemLeft}>
-                 <Ionicons name="sunny-outline" size={22} color="#1a1d1e" style={{ marginRight: 15 }} />
-                 <Text style={styles.sectionHeaderTitle}>Appearance</Text>
-              </View>
-              <View style={styles.appearanceBadge}>
-                 <Text style={styles.appearanceText}>Light</Text>
-                 <Ionicons name="chevron-down" size={14} color="#4ba1d3" style={{marginLeft: 4}} />
-              </View>
-           </View>
-        </View>
-
-        <View style={styles.cardSection}>
            <View style={styles.sensitiveRow}>
               <View style={styles.sensitiveIconBg}>
                  <Ionicons name="eye-off" size={22} color={theme.primary} />
@@ -346,8 +333,6 @@ const styles = StyleSheet.create({
   },
   
   sectionHeaderTitle: { fontSize: 16, fontFamily: FontFamily.bold, color: '#000' },
-  appearanceBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#e2f1f9', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 16 },
-  appearanceText: { fontSize: 13, fontFamily: FontFamily.bold, color: '#4ba1d3' },
 
   sensitiveRow: { flexDirection: 'row', paddingHorizontal: 15, paddingBottom: 10, alignItems: 'flex-start' },
   sensitiveIconBg: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#eef5ec', justifyContent: 'center', alignItems: 'center', marginRight: 15 },

@@ -24,6 +24,10 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const getTokenFromResponse = (payload: any): string | null => {
+    return payload?.token || payload?.data?.token || null;
+  };
+
   const handleRegister = async () => {
     if (!name || !email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -33,9 +37,10 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       const data = await register({ name, email, password });
+      const token = getTokenFromResponse(data);
       
-      if (data.success && data.data.token) {
-        await AsyncStorage.setItem('token', data.data.token);
+      if (data.success && token) {
+        await AsyncStorage.setItem('token', token);
         Alert.alert('Success', 'Account created successfully!', [
           { text: 'Start Shopping', onPress: () => router.replace('/(tabs)') }
         ]);

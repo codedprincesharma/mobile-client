@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } fr
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import MapComponent from '../../../components/MapComponent';
 import * as Location from 'expo-location';
-import { useSocket } from '../../../src/context/SocketContext';
 import { fetchMe, fetchOrderById } from '../../../src/api/services';
 
 interface LocationData {
@@ -15,7 +14,6 @@ interface LocationData {
 export default function DeliveryTrackingScreen() {
   const { id: orderId } = useLocalSearchParams();
   const router = useRouter();
-  const { socket, isConnected } = useSocket();
   
   const [user, setUser] = useState<any>(null);
   const [order, setOrder] = useState<any>(null);
@@ -30,18 +28,15 @@ export default function DeliveryTrackingScreen() {
   const locationSubRef = useRef<Location.LocationSubscription | null>(null);
 
   useEffect(() => {
-    if (orderId && isConnected && socket) {
+    if (orderId) {
       initTracking(orderId as string);
     }
     return () => {
       if (locationSubRef.current) {
         locationSubRef.current.remove();
       }
-      if (socket && orderId) {
-        socket.emit('leaveOrderRoom', orderId);
-      }
     };
-  }, [orderId, isConnected, socket]);
+  }, [orderId]);
 
   const initTracking = async (orderId: string) => {
     try {
@@ -61,26 +56,7 @@ export default function DeliveryTrackingScreen() {
       const custLng = currentOrder.shippingAddress?.longitude || -122.4324;
       setCustomerLocation({ latitude: custLat, longitude: custLng });
 
-      // 2. Setup Socket Listeners
-      if (socket) {
-        socket.emit('joinOrderRoom', orderId);
-
-        socket.on('locationUpdated', (data: LocationData) => {
-          setDeliveryLocation(data);
-          setRouteCoordinates(prev => [...prev, data]);
-          
-          if (mapRef.current && typeof mapRef.current.animateToRegion === 'function') {
-            mapRef.current.animateToRegion({
-              latitude: data.latitude,
-              longitude: data.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }, 1000);
-          }
-        });
-      }
-
-      // 3. If User is Delivery Role, Setup GPS Emission
+      // 2. If the user is a delivery partner or admin, request GPS permission and track location locally.
       if (currentUser.role === 'delivery' || currentUser.role === 'admin') {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
@@ -95,7 +71,6 @@ export default function DeliveryTrackingScreen() {
           heading: initialLoc.coords.heading || 0
         };
         setDeliveryLocation(initCoords);
-        socket?.emit('updateLocation', { orderId, ...initCoords });
 
         locationSubRef.current = await Location.watchPositionAsync(
           {
@@ -110,7 +85,6 @@ export default function DeliveryTrackingScreen() {
               heading: location.coords.heading || 0
             };
             setDeliveryLocation(coords);
-            socket?.emit('updateLocation', { orderId, ...coords });
           }
         );
       }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   View, 
   Text, 
@@ -13,11 +13,20 @@ import {
   Dimensions
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { login } from '../../src/api/services';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { login, googleLogin } from '../../src/api/services';
+import {
+  googleAuthRequestConfig,
+  googleAuthMissingConfigMessage,
+  googleAuthReady,
+} from '../../src/config/googleAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors, FontFamily } from '../../constants/theme';
 import { Images } from '../../constants/Assets';
 import { Ionicons } from '@expo/vector-icons';
+
+WebBrowser.maybeCompleteAuthSession();
 
 const { width, height } = Dimensions.get('window');
 
@@ -28,6 +37,67 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const getTokenFromResponse = (payload: any): string | null => {
+    return payload?.token || payload?.data?.token || null;
+  };
+
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest(googleAuthRequestConfig);
+
+  const handleGoogleSignIn = async () => {
+    if (!googleAuthReady) {
+      Alert.alert('Error', googleAuthMissingConfigMessage);
+      return;
+    }
+
+    if (!request) {
+      Alert.alert('Error', 'Google authentication is not ready yet.');
+      return;
+    }
+
+    await promptAsync();
+  };
+
+  useEffect(() => {
+    if (!response) {
+      return;
+    }
+
+    if (response.type === 'error') {
+      Alert.alert('Google Login Failed', response.error?.message || 'Unable to authenticate with Google.');
+      return;
+    }
+
+    if (response.type !== 'success') {
+      return;
+    }
+
+    const idToken = response.params?.id_token || response.authentication?.idToken;
+    if (!idToken) {
+      Alert.alert('Error', 'Google login did not return an ID token. Check your OAuth client IDs and redirect URI setup.');
+      return;
+    }
+
+    handleGoogleResponse(idToken);
+  }, [response]);
+
+  const handleGoogleResponse = async (idToken: string) => {
+    setLoading(true);
+    try {
+      const data = await googleLogin(idToken);
+      const token = getTokenFromResponse(data);
+      if (data.success && token) {
+        await AsyncStorage.setItem('token', token);
+        router.replace('/(tabs)');
+      } else {
+        throw new Error('Google login failed');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.response?.data?.message || error.message || 'Google login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please enter both username and password');
@@ -37,8 +107,9 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       const data = await login({ email, password });
-      if (data.success && data.data.token) {
-        await AsyncStorage.setItem('token', data.data.token);
+      const token = getTokenFromResponse(data);
+      if (data.success && token) {
+        await AsyncStorage.setItem('token', token);
         router.replace('/(tabs)');
       } else {
         throw new Error('No token received');
@@ -75,10 +146,11 @@ export default function LoginScreen() {
           <View style={styles.inputWrapper}>
              <TextInput
                 style={styles.input}
-                placeholder="Username"
+               placeholder="Email"
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
+               keyboardType="email-address"
                 placeholderTextColor="#a9a9a9"
              />
           </View>
@@ -106,6 +178,19 @@ export default function LoginScreen() {
               style={[styles.button, { backgroundColor: '#008e42' }, loading && styles.disabledButton]}
             >
               <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={handleGoogleSignIn}
+            disabled={loading || !request || !googleAuthReady}
+            activeOpacity={0.8}
+          >
+            <View 
+              style={[styles.button, styles.googleButton, (loading || !request || !googleAuthReady) && styles.disabledButton]}
+            >
+              <Ionicons name="logo-google" size={20} color="#333" style={styles.googleIcon} />
+              <Text style={[styles.buttonText, styles.googleButtonText]}>Continue with Google</Text>
             </View>
           </TouchableOpacity>
 
@@ -173,6 +258,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 6
+  },
+  googleButton: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#d9d9d9',
+    flexDirection: 'row',
+  },
+  googleButtonText: {
+    color: '#333',
+    marginLeft: 8,
+  },
+  googleIcon: {
+    marginRight: 8,
   },
   disabledButton: { opacity: 0.7 },
   buttonText: { color: '#ffffff', fontSize: 18, fontFamily: FontFamily.bold },

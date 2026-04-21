@@ -41,6 +41,11 @@ export const createOrder = async (orderData: any) => {
   return response.data;
 };
 
+export const googleLogin = async (idToken: string) => {
+  const response = await api.post('/auth/oauth/google', { idToken });
+  return response.data;
+};
+
 export const fetchOrders = async () => {
   // Call the user specific orders list
   const response = await api.get('/orders/my');

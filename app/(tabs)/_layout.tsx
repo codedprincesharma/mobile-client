@@ -1,14 +1,32 @@
-import { Tabs, useRouter } from 'expo-router';
-import React from 'react';
+import { Tabs, Redirect } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Platform, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Images, Icons } from '../../constants/Assets';
 
 const activeColor = '#008e42'; // Primary green
 const inactiveColor = '#9da39f'; 
 
 export default function TabLayout() {
-  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = await AsyncStorage.getItem('token');
+      setIsAuthenticated(!!token);
+    };
+
+    checkAuth();
+  }, []);
+
+  if (isAuthenticated === null) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)/login" />;
+  }
 
   return (
     <Tabs
