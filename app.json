@@ -8,6 +8,9 @@
     "scheme": "mobileclient",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "web": {
+      "bundler": "metro"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -22,10 +25,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.codedprincesharmasorganization.test"
     },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/icon.png"
-    },
+    
     "plugins": [
       "expo-router",
       [

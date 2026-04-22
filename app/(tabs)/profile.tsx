@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, SafeAreaView, StatusBar, Switch, Modal, TextInput, Alert, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, SafeAreaView, StatusBar, Modal, TextInput, Alert, Platform, KeyboardAvoidingView } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchMe, updateProfile } from '../../src/api/services';
@@ -22,7 +22,6 @@ export default function ProfileScreen() {
   const [user, setUser] = useState({ name: '', phone: '', dob: '', role: '' });
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', phone: '', dob: '' });
-  const [isSensitiveHidden, setIsSensitiveHidden] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -190,29 +189,6 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.cardSection}>
-           <View style={styles.sensitiveRow}>
-              <View style={styles.sensitiveIconBg}>
-                 <Ionicons name="eye-off" size={22} color={theme.primary} />
-              </View>
-              <View style={styles.sensitiveTextCol}>
-                 <Text style={styles.sensitiveTitle}>Hide sensitive items</Text>
-                 <Text style={styles.sensitiveDesc}>Sexual wellness, nicotine products and other sensitive items will be hidden</Text>
-                 <TouchableOpacity>
-                   <Text style={styles.knowMoreText}>Know more</Text>
-                 </TouchableOpacity>
-              </View>
-              <View style={styles.switchCol}>
-                 <Switch 
-                   trackColor={{ false: '#d1d8d5', true: '#d1d8d5' }}
-                   thumbColor={isSensitiveHidden ? theme.primary : '#fff'}
-                   value={isSensitiveHidden}
-                   onValueChange={setIsSensitiveHidden}
-                 />
-              </View>
-           </View>
-        </View>
-
-        <View style={styles.cardSection}>
            <Text style={styles.cardGroupTitle}>Your information</Text>
            <ListItem icon="person-outline" label="Update profile" onPress={() => setIsEditModalVisible(true)} />
            <ListItem icon="book-outline" label="Address book" onPress={() => router.push('/address-book' as any)} />
@@ -333,14 +309,6 @@ const styles = StyleSheet.create({
   },
   
   sectionHeaderTitle: { fontSize: 16, fontFamily: FontFamily.bold, color: '#000' },
-
-  sensitiveRow: { flexDirection: 'row', paddingHorizontal: 15, paddingBottom: 10, alignItems: 'flex-start' },
-  sensitiveIconBg: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#eef5ec', justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-  sensitiveTextCol: { flex: 1 },
-  sensitiveTitle: { fontSize: 15, fontFamily: FontFamily.bold, color: '#000', marginBottom: 4 },
-  sensitiveDesc: { fontSize: 12, fontFamily: FontFamily.medium, color: '#888', lineHeight: 18, marginBottom: 6 },
-  knowMoreText: { fontSize: 13, fontFamily: FontFamily.bold, color: theme.primary },
-  switchCol: { justifyContent: 'flex-start', paddingTop: 10 },
 
   cardGroupTitle: { fontSize: 16, fontFamily: FontFamily.bold, color: '#000', paddingHorizontal: 15, marginBottom: 5 },
   listItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, marginHorizontal: 15, borderBottomWidth: 1, borderBottomColor: '#f0f3f1' },
