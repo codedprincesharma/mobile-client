@@ -7,39 +7,35 @@ import {
   ActivityIndicator, 
   TouchableOpacity, 
   Image, 
-  TextInput,
-  Dimensions,
   StatusBar,
   RefreshControl,
-  SafeAreaView,
   Platform
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { fetchProducts, fetchCategories } from '../../src/api/services';
+import { fetchProducts } from '../../src/api/services';
 import { useCart } from '../../src/context/CartContext';
-import { Images, Categories as CategoryImages, Products as ProductImages, Icons } from '../../constants/Assets';
+import { Images, Categories as CategoryImages, Products as ProductImages } from '../../constants/Assets';
 import { FontFamily } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
-
-const theme = {
-  primary: '#008e42', // Bold green from screenshot
-  topBg: '#005b2a', // Darker green gradient equivalent used for top section
-  surface: '#ffffff',
-  surfaceLow: '#f6f6f6',
-  surfaceLowest: '#fcfcfc',
-  onSurface: '#1a1d1e',
-  onSurfaceVariant: '#6e7774',
-};
+import { useResponsive } from '../../src/utils/responsive';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { isDesktop, isTablet } = useResponsive();
   const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const theme = {
+    primary: '#008e42',
+    topBg: '#005b2a',
+    surface: '#ffffff',
+    surfaceLow: '#f6f6f6',
+    surfaceLowest: '#fcfcfc',
+    onSurface: '#1a1d1e',
+    onSurfaceVariant: '#6e7774',
+  };
 
   useEffect(() => {
     loadData();
@@ -47,12 +43,8 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
-      const [prodRes, catRes] = await Promise.all([
-        fetchProducts(),
-        fetchCategories()
-      ]);
+      const prodRes = await fetchProducts();
       setProducts(prodRes.data || []);
-      setCategories(catRes.data || []);
     } catch (error) {
       console.error('Failed to load data', error);
     } finally {
@@ -95,7 +87,7 @@ export default function HomeScreen() {
     <View style={styles.searchWrapper}>
       <TouchableOpacity style={styles.searchContainer} activeOpacity={0.9} onPress={() => router.push('/search')}>
         <Ionicons name="search" size={20} color="#aaa" style={styles.searchIcon} />
-        <Text style={styles.searchPlaceholder}>Search "Organic Apples"</Text>
+        <Text style={styles.searchPlaceholder}>Search &quot;Organic Apples&quot;</Text>
       </TouchableOpacity>
     </View>
   );
@@ -226,9 +218,9 @@ const styles = StyleSheet.create({
   listContainer: { paddingBottom: 120 },
 
   greenTopBg: {
-    backgroundColor: '#00a350', // Solid green matching the top header
-    paddingTop: Platform.OS === 'ios' ? 50 : 30, // SafeArea replacement
-    paddingBottom: 60, // Extra padding so search bar overlaps
+    backgroundColor: '#00a350',
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    paddingBottom: 60,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -259,7 +251,7 @@ const styles = StyleSheet.create({
   },
 
   overlapSection: {
-    marginTop: -30, // Overlap the green background
+    marginTop: -30,
     paddingHorizontal: 20,
   },
   
@@ -305,14 +297,12 @@ const styles = StyleSheet.create({
   // Product Grid
   productCard: {
     flex: 1,
-    margin: 8, // from paddingHorizontal
+    margin: 8,
     backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 12,
     borderWidth: 1,
     borderColor: '#eee',
-    // To match 2 column layout precisely
-    maxWidth: (width - 40 - 16) / 2, 
   },
   productImageWrapper: {
     width: '100%',
@@ -331,7 +321,7 @@ const styles = StyleSheet.create({
   
   addBtn: {
     width: 28, height: 28,
-    borderRadius: 8, // squarish button as in reference
+    borderRadius: 8,
     backgroundColor: '#008e42',
     alignItems: 'center',
     justifyContent: 'center',

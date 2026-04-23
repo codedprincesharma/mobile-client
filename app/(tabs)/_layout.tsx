@@ -1,15 +1,17 @@
 import { Tabs, Redirect } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Platform, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Platform, View, Image, StyleSheet, useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Images, Icons } from '../../constants/Assets';
+import { Images } from '../../constants/Assets';
 
 const activeColor = '#008e42'; // Primary green
 const inactiveColor = '#9da39f'; 
 
 export default function TabLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -34,8 +36,24 @@ export default function TabLayout() {
         tabBarActiveTintColor: activeColor,
         tabBarInactiveTintColor: inactiveColor,
         headerShown: false,
-        tabBarShowLabel: false, // Ensure no text labels as per UI
-        tabBarStyle: {
+        tabBarShowLabel: !isDesktop,
+        tabBarPosition: isDesktop ? 'top' : 'bottom',
+        tabBarStyle: isDesktop ? {
+          backgroundColor: '#ffffff',
+          borderBottomWidth: 1,
+          borderBottomColor: '#f4f6f5',
+          elevation: 5,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 8,
+          height: 60,
+          paddingVertical: 8,
+          paddingHorizontal: 20,
+          flexDirection: 'row',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+        } : {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
           borderTopColor: '#f4f6f5',

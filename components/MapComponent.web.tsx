@@ -11,6 +11,7 @@ export interface MapComponentProps {
 }
 
 const MapComponent = forwardRef<any, MapComponentProps>(({ style }, ref) => {
+  MapComponent.displayName = 'MapComponent';
   return (
     <View style={[style, styles.placeholder]} ref={ref}>
       <Text style={styles.text}>📍 Map Preview Not Available on Web</Text>

@@ -6,7 +6,7 @@ import { Products as ProductImages } from '../../constants/Assets';
 import { FontFamily } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+
 
 const theme = {
   primary: '#008e42',

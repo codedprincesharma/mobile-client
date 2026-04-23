@@ -34,7 +34,7 @@ export default function TicketsScreen() {
               <Ionicons name="ticket-outline" size={48} color={theme.primary} />
            </View>
            <Text style={styles.emptyTitle}>No Active Tickets</Text>
-           <Text style={styles.emptyDesc}>If you're facing any issues with your orders or account, you can raise a support ticket.</Text>
+           <Text style={styles.emptyDesc}>If you&apos;re facing any issues with your orders or account, you can raise a support ticket.</Text>
            
            <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.8}>
              <Ionicons name="chatbubbles" size={20} color="#fff" style={{marginRight: 8}} />

@@ -12,7 +12,7 @@ import {
 import { useRouter } from 'expo-router';
 import { fetchProducts, adminDeleteProduct } from '../../src/api/services';
 import { Colors, FontFamily } from '../../constants/theme';
-import { Icons } from '../../constants/Assets';
+
 
 export default function AdminProductListScreen() {
   const [products, setProducts] = useState<any[]>([]);

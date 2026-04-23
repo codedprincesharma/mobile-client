@@ -36,7 +36,7 @@ export default function ManageCategoryScreen() {
         setName(category.name);
         setDescription(category.description);
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to load category details');
     } finally {
       setFetching(false);
@@ -59,8 +59,8 @@ export default function ManageCategoryScreen() {
       Alert.alert('Success', `Category ${id ? 'updated' : 'created'} successfully!`, [
         { text: 'OK', onPress: () => router.back() }
       ]);
-    } catch (error: any) {
-      Alert.alert('Error', error.response?.data?.message || 'Failed to save category');
+    } catch (err: any) {
+      Alert.alert('Error', err.response?.data?.message || 'Failed to save category');
     } finally {
       setLoading(false);
     }

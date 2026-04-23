@@ -12,11 +12,10 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-  ViewStyle,
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BestSellerProduct } from '../utils/bestSellersAnalyzer';
+import { BestSellerProduct } from '../src/utils/bestSellersAnalyzer';
 
 interface BestSellersDisplayProps {
   products: BestSellerProduct[];

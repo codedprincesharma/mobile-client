@@ -197,7 +197,7 @@ export default function SearchScreen() {
         ) : hasSearched && results.length === 0 ? (
            <View style={styles.center}>
              <Ionicons name="search-outline" size={60} color="#e1e5e3" />
-             <Text style={styles.noResultsText}>No products found for "{query}"</Text>
+             <Text style={styles.noResultsText}>No products found for &quot;{query}&quot;</Text>
              <Text style={styles.noResultsSub}>Try checking your spelling or use general terms</Text>
            </View>
         ) : null}

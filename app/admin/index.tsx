@@ -15,8 +15,7 @@ import {
 import { useRouter } from 'expo-router';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { adminGetStats } from '../../src/api/services';
-import { Colors, FontFamily } from '../../constants/theme';
-import { Icons } from '../../constants/Assets';
+import { FontFamily } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function AdminDashboardScreen() {

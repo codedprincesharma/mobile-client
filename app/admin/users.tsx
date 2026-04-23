@@ -39,7 +39,7 @@ export default function AdminUsersScreen() {
     try {
       await adminUpdateUserStatus(userId, !currentStatus);
       setUsers(users.map(u => u._id === userId ? { ...u, isActive: !currentStatus } : u));
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to update user status');
     }
   };

@@ -6,8 +6,7 @@ import {
   FlatList, 
   TouchableOpacity, 
   ActivityIndicator, 
-  Alert,
-  Image
+  Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { fetchCategories, adminDeleteCategory } from '../../src/api/services';
@@ -47,7 +46,7 @@ export default function AdminCategoriesScreen() {
             try {
               await adminDeleteCategory(id);
               loadCategories();
-            } catch (error) {
+            } catch {
               Alert.alert('Error', 'Failed to delete category');
             }
           }

@@ -6,7 +6,7 @@ import { createOrder } from '../../src/api/services';
 import { Colors, FontFamily } from '../../constants/theme';
 import { Icons } from '../../constants/Assets';
 
-const { width } = Dimensions.get('window');
+
 
 export default function CheckoutScreen() {
   const { items, totalPrice, clearCart } = useCart();

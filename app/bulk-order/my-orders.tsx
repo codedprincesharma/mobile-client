@@ -87,7 +87,7 @@ export default function MyBulkOrdersScreen() {
              <Ionicons name="cube-outline" size={48} color={theme.primary} />
           </View>
           <Text style={styles.emptyTitle}>No Bulk Orders Yet</Text>
-          <Text style={styles.emptyText}>You haven't requested any bulk orders for your events.</Text>
+           <Text style={styles.emptyText}>You haven&apos;t requested any bulk orders for your events.</Text>
           <TouchableOpacity style={styles.primaryButton} onPress={() => router.push('/bulk-order')}>
             <Text style={styles.primaryButtonText}>Request Bulk Order</Text>
           </TouchableOpacity>

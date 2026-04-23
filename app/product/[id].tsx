@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { fetchProductById } from '../../src/api/services';
 import { useCart } from '../../src/context/CartContext';
 import { Products as ProductImages, Icons } from '../../constants/Assets';
-import { Colors, FontFamily } from '../../constants/theme';
+import { FontFamily } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
 const BRAND_GREEN = '#34B53A';

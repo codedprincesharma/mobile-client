@@ -41,10 +41,6 @@ export default function ManageProductScreen() {
     image: '' 
   });
 
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
   const loadInitialData = async () => {
     try {
       setLoading(true);
@@ -70,6 +66,10 @@ export default function ManageProductScreen() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();

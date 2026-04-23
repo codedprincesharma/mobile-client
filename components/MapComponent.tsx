@@ -15,6 +15,7 @@ const MapComponent = forwardRef<MapView, MapComponentProps>(({
   userRole,
   ...props 
 }, ref) => {
+  MapComponent.displayName = 'MapComponent';
   return (
     <MapView
       ref={ref}

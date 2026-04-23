@@ -159,7 +159,7 @@ export default function OrdersListScreen() {
       return (
         <View style={styles.emptyStateContainer}>
           <Ionicons name="bag-outline" size={60} color="#bdc3c7" />
-          <Text style={styles.emptyText}>You haven't placed any orders yet.</Text>
+          <Text style={styles.emptyText}>You haven&apos;t placed any orders yet.</Text>
           <TouchableOpacity 
             style={styles.browseButton} 
             onPress={() => router.replace('/(tabs)')}

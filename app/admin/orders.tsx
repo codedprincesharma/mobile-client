@@ -57,7 +57,7 @@ export default function AdminOrdersScreen() {
             await adminUpdateOrderStatus(orderId, status);
             setOrders(orders.map(o => o._id === orderId ? { ...o, status } : o));
             Alert.alert('Success', `Order marked as ${status}`);
-          } catch (error) {
+          } catch {
             Alert.alert('Error', 'Failed to update status');
           }
         },

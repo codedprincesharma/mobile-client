@@ -9,8 +9,7 @@ import {
   Image, 
   KeyboardAvoidingView, 
   Platform,
-  ScrollView,
-  Dimensions
+  ScrollView
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -22,13 +21,13 @@ import {
   googleAuthReady,
 } from '../../src/config/googleAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Colors, FontFamily } from '../../constants/theme';
+import { FontFamily } from '../../constants/theme';
 import { Images } from '../../constants/Assets';
 import { Ionicons } from '@expo/vector-icons';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const { width, height } = Dimensions.get('window');
+
 
 export default function LoginScreen() {
   const router = useRouter();
