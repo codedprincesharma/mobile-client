@@ -130,3 +130,13 @@ export const adminDeleteCategory = async (id: string) => {
   const response = await api.delete(`/categories/${id}`);
   return response.data;
 };
+
+export const fetchSettings = async () => {
+  const response = await api.get('/settings');
+  return response.data;
+};
+
+export const adminUpdateSettings = async (data: any) => {
+  const response = await api.put('/admin/settings', data);
+  return response.data;
+};

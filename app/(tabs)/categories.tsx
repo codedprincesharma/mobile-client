@@ -14,16 +14,17 @@ const theme = {
 };
 
 const GROCERY_CATEGORIES = [
-  { id: '1', name: 'Fresh\nProduce', icon: 'leaf-outline', color: '#e9f5ed', iconColor: '#27ae60' },
-  { id: '2', name: 'Dairy &\nBreakfast', icon: 'water-outline', color: '#fff9e6', iconColor: '#f39c12' },
-  { id: '3', name: 'Snacks &\nMunchies', icon: 'fast-food-outline', color: '#ffeaea', iconColor: '#e74c3c' },
-  { id: '4', name: 'Cold Drinks\n& Juices', icon: 'cafe-outline', color: '#eef6ff', iconColor: '#3498db' },
-  { id: '5', name: 'Meat &\nSeafood', icon: 'fish-outline', color: '#fae8e8', iconColor: '#c0392b' },
-  { id: '6', name: 'Bakery &\nBiscuits', icon: 'restaurant-outline', color: '#f5ebe6', iconColor: '#d35400' },
-  { id: '7', name: 'Cleaners &\nRepellents', icon: 'sparkles-outline', color: '#e8f7fb', iconColor: '#1abc9c' },
-  { id: '8', name: 'Personal\nCare', icon: 'fitness-outline', color: '#f5ecfc', iconColor: '#9b59b6' },
-  { id: '9', name: 'Tea, Coffee\n& Health', icon: 'pint-outline', color: '#fff0e6', iconColor: '#e67e22' },
-  { id: '10', name: 'Atta, Rice\n& Dal', icon: 'basket-outline', color: '#e8f0e5', iconColor: '#2ecc71' },
+  { id: '1', name: 'Fruits &\nVegetables', icon: 'leaf-outline', color: '#e8f5ce', iconColor: '#27ae60' },
+  { id: '2', name: 'Dairy &\nBakery', icon: 'water-outline', color: '#fff9e6', iconColor: '#f39c12' },
+  { id: '3', name: 'Staples', icon: 'basket-outline', color: '#f5ebe6', iconColor: '#d35400' },
+  { id: '4', name: 'Snacks &\nBeverages', icon: 'cafe-outline', color: '#ffeaea', iconColor: '#e74c3c' },
+  { id: '5', name: 'Instant &\nFrozen Food', icon: 'snow-outline', color: '#e8f7fb', iconColor: '#3498db' },
+  { id: '6', name: 'Dry Fruits\n& Nuts', icon: 'nutrition-outline', color: '#f9e8d8', iconColor: '#8B4513' },
+  { id: '7', name: 'Personal\nCare', icon: 'fitness-outline', color: '#f5ecfc', iconColor: '#9b59b6' },
+  { id: '8', name: 'Household\nItems', icon: 'home-outline', color: '#e0f2f1', iconColor: '#1abc9c' },
+  { id: '9', name: 'Baby\nCare', icon: 'heart-outline', color: '#fce4ec', iconColor: '#e91e63' },
+  { id: '10', name: 'Pet\nSupplies', icon: 'paw-outline', color: '#f3e5f5', iconColor: '#a87000' },
+  { id: '11', name: 'Sweets &\nChocolates', icon: 'star-outline', color: '#fff3e0', iconColor: '#ff6f00' },
 ];
 
 export default function CategoriesScreen() {

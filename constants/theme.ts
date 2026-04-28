@@ -5,7 +5,7 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#e03d4e'; // Reddish brand color from the logo
+const tintColorLight = '#008e42'; // Green brand color
 const tintColorDark = '#fff';
 
 export const Colors = {

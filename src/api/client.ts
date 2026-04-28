@@ -2,9 +2,15 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-// Use 10.0.2.2 for Android Emulator, localhost for iOS simulator/web
-// Replace with your actual connected WiFi IP if testing on physical device (e.g. 192.168.x.x)
-export const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/api' : 'http://localhost:5000/api';
+// Get API URL from environment variables or use platform-specific defaults
+const getBaseUrl = (): string => {
+  if (Platform.OS === 'android') {
+    return process.env.EXPO_PUBLIC_API_URL_ANDROID || 'http://10.0.2.2:5000/api';
+  }
+  return process.env.EXPO_PUBLIC_API_URL_DEFAULT || 'http://localhost:5000/api';
+};
+
+export const BASE_URL = getBaseUrl();
 
 const api = axios.create({
   baseURL: BASE_URL,

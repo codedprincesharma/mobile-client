@@ -126,7 +126,11 @@ export default function CartScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.mainPayBtn} activeOpacity={0.8}>
+        <TouchableOpacity 
+          style={styles.mainPayBtn} 
+          activeOpacity={0.8}
+          onPress={() => router.push('/checkout')}
+        >
            <Text style={styles.mainPayText}>Proceed to Pay</Text>
         </TouchableOpacity>
 
@@ -161,7 +165,11 @@ export default function CartScreen() {
           </View>
         </View>
         
-        <TouchableOpacity style={styles.mainPayBtn} activeOpacity={0.8}>
+        <TouchableOpacity 
+          style={styles.mainPayBtn} 
+          activeOpacity={0.8}
+          onPress={() => router.push('/checkout')}
+        >
            <Text style={styles.mainPayText}>Proceed to Pay</Text>
         </TouchableOpacity>
 

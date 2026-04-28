@@ -203,6 +203,12 @@ export default function AdminDashboardScreen() {
               onPress={() => router.push('/admin/orders' as any)} 
             />
             <ShortcutPill 
+              delay={750}
+              title="Delivery & GST Settings" 
+              iconName="bicycle" 
+              onPress={() => router.push('/admin/delivery-settings' as any)} 
+            />
+            <ShortcutPill 
               delay={800}
               title="Promotions & Coupons" 
               iconName="pricetags" 

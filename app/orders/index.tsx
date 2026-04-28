@@ -9,12 +9,24 @@ import {
   RefreshControl,
   SectionList,
   Alert,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { fetchOrders } from '../../src/api/services';
 import { useBestSellers, useBestSellerAnalytics } from '../../src/hooks/useBestSellers';
 import BestSellersDisplay from '../../components/BestSellersDisplay';
 import { Ionicons } from '@expo/vector-icons';
+import { FontFamily } from '../../constants/theme';
+
+// Dummy best sellers products
+const DUMMY_BEST_SELLERS = [
+  { _id: 'dummy1', name: 'Fresh Organic Apples', price: 4.99, image: 'https://via.placeholder.com/120?text=Apples' },
+  { _id: 'dummy2', name: 'Greek Yogurt 500g', price: 3.99, image: 'https://via.placeholder.com/120?text=Yogurt' },
+  { _id: 'dummy3', name: 'Whole Wheat Bread', price: 2.49, image: 'https://via.placeholder.com/120?text=Bread' },
+  { _id: 'dummy4', name: 'Almond Butter Jar', price: 8.99, image: 'https://via.placeholder.com/120?text=Butter' },
+  { _id: 'dummy5', name: 'Mixed Berry Pack', price: 5.99, image: 'https://via.placeholder.com/120?text=Berries' },
+  { _id: 'dummy6', name: 'Organic Spinach', price: 1.99, image: 'https://via.placeholder.com/120?text=Spinach' },
+];
 
 interface OrderSection {
   title: string;
@@ -97,11 +109,12 @@ export default function OrdersListScreen() {
   const sections: OrderSection[] = useMemo(() => {
     const result: OrderSection[] = [];
 
-    // Add best sellers section if orders exist
-    if (orders.length > 0 && showBestSellers) {
+    // Always add best sellers section at the top
+    if (showBestSellers) {
+      const displayBestSellers = bestSellers && bestSellers.length > 0 ? bestSellers : DUMMY_BEST_SELLERS;
       result.push({
-        title: 'Best Sellers This Month',
-        data: [{ type: 'best-sellers' }],
+        title: 'Suggestions for You',
+        data: [{ type: 'best-sellers', products: displayBestSellers }],
         type: 'best-sellers',
       });
     }
@@ -113,7 +126,7 @@ export default function OrdersListScreen() {
         data: orders,
         type: 'orders',
       });
-    } else {
+    } else if (!showBestSellers) {
       result.push({
         title: 'No Orders',
         data: [{ empty: true }],
@@ -122,7 +135,7 @@ export default function OrdersListScreen() {
     }
 
     return result;
-  }, [orders, showBestSellers]);
+  }, [orders, showBestSellers, bestSellers]);
 
   const renderSectionHeader = ({ section }: { section: OrderSection }) => (
     <View style={styles.sectionHeader}>
@@ -138,18 +151,30 @@ export default function OrdersListScreen() {
   const renderItem = ({ item, section }: { item: any; section: OrderSection }) => {
     // Render best sellers section
     if (section.type === 'best-sellers') {
+      const productsToDisplay = item.products || (bestSellers && bestSellers.length > 0 ? bestSellers : DUMMY_BEST_SELLERS);
       return (
         <View style={styles.bestSellersContainer}>
-          <BestSellersDisplay
-            products={bestSellers}
-            loading={bestSellersLoading}
-            error={bestSellersError}
-            onProductPress={handleBestSellerPress}
-            horizontal={false}
-            maxItems={6}
-            showStats={true}
-            onRefresh={refreshBestSellers}
-          />
+          <View style={styles.suggestionGrid}>
+            {productsToDisplay.slice(0, 6).map((product: any, idx: number) => (
+              <TouchableOpacity
+                key={product._id}
+                style={styles.suggestionCard}
+                onPress={() => {
+                  analytics.trackProductClick(product._id, idx);
+                  router.push(`/product/${product._id}`);
+                }}
+              >
+                <View style={styles.suggestionImageWrapper}>
+                  <Image 
+                    source={{ uri: product.image }}
+                    style={styles.suggestionImage}
+                  />
+                </View>
+                <Text style={styles.suggestionName} numberOfLines={2}>{product.name}</Text>
+                <Text style={styles.suggestionPrice}>${product.price?.toFixed(2) || '0.00'}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       );
     }
@@ -413,6 +438,48 @@ const styles = StyleSheet.create({
   orderTotal: {
     fontSize: 18,
     fontWeight: '700',
+    color: '#008e42',
+  },
+  suggestionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    justifyContent: 'space-between',
+  },
+  suggestionCard: {
+    width: '30%',
+    marginBottom: 16,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    padding: 10,
+    alignItems: 'center',
+  },
+  suggestionImageWrapper: {
+    width: '100%',
+    height: 80,
+    backgroundColor: '#e8f5ce',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  suggestionImage: {
+    width: '80%',
+    height: '80%',
+    resizeMode: 'contain',
+  },
+  suggestionName: {
+    fontSize: 12,
+    fontFamily: FontFamily.medium,
+    color: '#1a1d1e',
+    textAlign: 'center',
+    marginBottom: 6,
+    lineHeight: 16,
+  },
+  suggestionPrice: {
+    fontSize: 14,
+    fontFamily: FontFamily.bold,
     color: '#008e42',
   },
 });

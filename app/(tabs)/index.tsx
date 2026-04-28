@@ -24,13 +24,54 @@ import { Ionicons } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
 
 const theme = {
-  primary: '#008e42', // Bold green from screenshot
-  topBg: '#005b2a', // Darker green gradient equivalent used for top section
+  primary: '#008e42', // Green brand color
+  lime: '#d4e961', // Bright lime green from screenshot
+  topBg: '#b8d945', // Bright green-yellow for top section
+  paleGreen: '#e8f5ce', // Pale green for product cards
   surface: '#ffffff',
   surfaceLow: '#f6f6f6',
   surfaceLowest: '#fcfcfc',
   onSurface: '#1a1d1e',
   onSurfaceVariant: '#6e7774',
+};
+
+// Dummy products by category
+const CATEGORY_PRODUCTS = {
+  'Crunchy Bites': [
+    { id: '1', name: "Lay's American Style Crea", price: 30, original: 45, image: 'https://via.placeholder.com/100?text=Lays' },
+    { id: '2', name: 'Kurkure Masala Munch', price: 19, original: 20, image: 'https://via.placeholder.com/100?text=Kurkure' },
+    { id: '3', name: "Lay's Potato Chips", price: 35, original: 50, image: 'https://via.placeholder.com/100?text=Chips' },
+  ],
+  'Daily Staples': [
+    { id: '4', name: 'Tata Sampann Fine Besan', price: 48, original: 80, image: 'https://via.placeholder.com/100?text=Besan' },
+    { id: '5', name: 'Tata Sampann Unpolished Rice', price: 106.02, original: 114, image: 'https://via.placeholder.com/100?text=Rice' },
+    { id: '6', name: 'Aashirvaad Atta', price: 55, original: 65, image: 'https://via.placeholder.com/100?text=Atta' },
+  ],
+  'Household Essentials': [
+    { id: '7', name: 'Cleaner Spray', price: 120, original: 150, image: 'https://via.placeholder.com/100?text=Cleaner' },
+    { id: '8', name: 'Dish Wash Liquid', price: 65, original: 85, image: 'https://via.placeholder.com/100?text=DishWash' },
+    { id: '9', name: 'Laundry Detergent', price: 180, original: 220, image: 'https://via.placeholder.com/100?text=Detergent' },
+  ],
+  'Sweets': [
+    { id: '10', name: 'Cadbury Lickables Oreo', price: 42.3, original: 45, image: 'https://via.placeholder.com/100?text=Lickables' },
+    { id: '11', name: 'Cadbury Choclairs Gold', price: 237.6, original: 240, image: 'https://via.placeholder.com/100?text=Choclairs' },
+    { id: '12', name: 'Ferrero Rocher', price: 350, original: 400, image: 'https://via.placeholder.com/100?text=Ferrero' },
+  ],
+  'Cold Drinks & Beverages': [
+    { id: '13', name: 'Thums Up X Force Soft Dri', price: 9.1, original: 10, image: 'https://via.placeholder.com/100?text=ThumsUp' },
+    { id: '14', name: 'Sprite Soft Drink 750 Ml', price: 39.2, original: 40, image: 'https://via.placeholder.com/100?text=Sprite' },
+    { id: '15', name: 'Fanta Orange', price: 35, original: 45, image: 'https://via.placeholder.com/100?text=Fanta' },
+  ],
+  'Dairy & Bakery': [
+    { id: '16', name: 'Amul Butter 500g', price: 280, original: 320, image: 'https://via.placeholder.com/100?text=Butter' },
+    { id: '17', name: 'Britannia Bread', price: 45, original: 55, image: 'https://via.placeholder.com/100?text=Bread' },
+    { id: '18', name: 'Milk 1L', price: 60, original: 75, image: 'https://via.placeholder.com/100?text=Milk' },
+  ],
+  'Personal Care': [
+    { id: '19', name: 'Shampoo 500ml', price: 120, original: 150, image: 'https://via.placeholder.com/100?text=Shampoo' },
+    { id: '20', name: 'Toothpaste 150g', price: 45, original: 65, image: 'https://via.placeholder.com/100?text=Toothpaste' },
+    { id: '21', name: 'Soap 100g', price: 30, original: 40, image: 'https://via.placeholder.com/100?text=Soap' },
+  ],
 };
 
 export default function HomeScreen() {
@@ -114,25 +155,123 @@ export default function HomeScreen() {
   );
 
   const catData = [
-    { id: '1', name: 'Fruits', img: CategoryImages.cat4 },
-    { id: '2', name: 'Vegetables', img: CategoryImages.cat3 },
-    { id: '3', name: 'Dairy', img: CategoryImages.cat1 },
-    { id: '4', name: 'Snacks', img: CategoryImages.cat2 },
+    { id: '1', name: 'All', icon: '🏪' },
+    { id: '2', name: 'Quick Bites', icon: '🍱' },
+    { id: '3', name: 'Home Kirana', icon: '🏠' },
+    { id: '4', name: 'Home Cleaning', icon: '🧹' },
   ];
 
-  const renderCategories = () => (
-    <View style={styles.sectionContainer}>
-      <Text style={styles.sectionTitle}>Categories</Text>
-      <View style={styles.categoryGrid}>
-        {catData.map(cat => (
-          <TouchableOpacity key={cat.id} style={styles.catItem}>
-             <View style={styles.catImageContainer}>
-               <Image source={cat.img} style={styles.catImage} />
-             </View>
-             <Text style={styles.catText}>{cat.name}</Text>
+  const renderCategoryTabs = () => (
+    <View style={styles.categoryTabsWrapper}>
+      <View style={styles.categoryTabs}>
+        {catData.map((cat, idx) => (
+          <TouchableOpacity 
+            key={cat.id} 
+            style={[
+              styles.catTab,
+              idx === 0 && styles.catTabActive
+            ]}
+          >
+            <Text style={[
+              styles.catTabText,
+              idx === 0 && styles.catTabTextActive
+            ]}>
+              {cat.name}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
+    </View>
+  );
+
+  const bestSellersProducts = products.slice(0, 6);
+
+  const renderBestsellers = () => (
+    <View style={styles.bestsellersSection}>
+      <Text style={styles.sectionTitle}>Bestsellers</Text>
+      <View style={styles.bestsellersGrid}>
+        {bestSellersProducts.map((product, idx) => {
+          let productImage: any = null;
+          if (ProductImages && (ProductImages as any)[`p${(idx % 16) + 1}`]) {
+            productImage = (ProductImages as any)[`p${(idx % 16) + 1}`];
+          } else {
+            productImage = { uri: product.images?.[0] || 'https://via.placeholder.com/150' };
+          }
+
+          return (
+            <TouchableOpacity
+              key={product._id}
+              style={styles.bestsellersCard}
+              onPress={() => router.push(`/product/${product._id}`)}
+            >
+              <View style={styles.bestsellersImageWrapper}>
+                <Image source={productImage} style={styles.bestsellersImage} />
+              </View>
+              <Text style={styles.bestsellersName} numberOfLines={1}>{product.name}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+
+  const renderPromoSection = () => (
+    <View style={styles.promoSection}>
+      <View style={styles.promoContent}>
+        <Ionicons name="flash" size={32} color={theme.primary} style={styles.promoIcon} />
+        <Text style={styles.promoTitle}>Ghrigo</Text>
+        <Text style={styles.promoText}>Minutes me milegga</Text>
+        <Ionicons name="heart" size={20} color="#ff1744" style={styles.promoHeart} />
+      </View>
+    </View>
+  );
+
+  const renderCategoryProducts = () => (
+    <View style={styles.categoriesProductsWrapper}>
+      {Object.entries(CATEGORY_PRODUCTS).map(([categoryName, categoryProducts]) => (
+        <View key={categoryName} style={styles.categoryProductSection}>
+          <View style={styles.categoryProductHeader}>
+            <Text style={styles.categoryProductTitle}>{categoryName}</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeMoreLink}>See more like this</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <FlatList
+            data={categoryProducts}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity 
+                style={styles.categoryProductCard}
+                onPress={() => router.push(`/product/${item.id}`)}
+              >
+                <View style={styles.categoryProductImageWrapper}>
+                  <Image 
+                    source={{ uri: item.image }}
+                    style={styles.categoryProductImage}
+                  />
+                </View>
+                <Text style={styles.categoryProductName} numberOfLines={2}>{item.name}</Text>
+                <View style={styles.categoryProductPriceRow}>
+                  <Text style={styles.categoryProductPrice}>₹{item.price}</Text>
+                  {item.original && (
+                    <Text style={styles.categoryProductOriginal}>₹{item.original}</Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+            )}
+            horizontal
+            scrollEnabled
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryProductsScroll}
+          />
+
+          <TouchableOpacity style={styles.seeAllCategoryBtn}>
+            <Text style={styles.seeAllCategoryText}>See All {categoryName}</Text>
+            <Ionicons name="chevron-forward" size={18} color={theme.primary} />
+          </TouchableOpacity>
+        </View>
+      ))}
     </View>
   );
 
@@ -179,17 +318,10 @@ export default function HomeScreen() {
       {/* Overlapping section */}
       <View style={styles.overlapSection}>
         {renderSearch()}
-        {renderHeroBanner()}
-        {renderCategories()}
-        
-        <View style={[styles.sectionContainer, { marginTop: 10 }]}>
-           <View style={styles.sectionTitleRow}>
-              <Text style={styles.sectionTitle}>Featured Items</Text>
-              <TouchableOpacity>
-                 <Text style={styles.seeAllText}>See All</Text>
-              </TouchableOpacity>
-           </View>
-        </View>
+        {renderCategoryTabs()}
+        {renderBestsellers()}
+        {renderPromoSection()}
+        {renderCategoryProducts()}
       </View>
     </View>
   );
@@ -205,7 +337,7 @@ export default function HomeScreen() {
   // Use 2 columns to match the Product Listing image
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor="#006c3a" />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.topBg} />
       <FlatList
         data={products}
         keyExtractor={(item) => item._id}
@@ -213,7 +345,7 @@ export default function HomeScreen() {
         numColumns={2}
         ListHeaderComponent={renderHeader}
         contentContainerStyle={styles.listContainer}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" colors={[theme.primary]} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} colors={[theme.primary]} />}
         showsVerticalScrollIndicator={false}
       />
     </View>
@@ -226,12 +358,12 @@ const styles = StyleSheet.create({
   listContainer: { paddingBottom: 120 },
 
   greenTopBg: {
-    backgroundColor: '#00a350', // Solid green matching the top header
-    paddingTop: Platform.OS === 'ios' ? 50 : 30, // SafeArea replacement
-    paddingBottom: 60, // Extra padding so search bar overlaps
+    backgroundColor: theme.topBg,
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    paddingBottom: 20,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   
   topBrandSection: {
@@ -259,11 +391,13 @@ const styles = StyleSheet.create({
   },
 
   overlapSection: {
-    marginTop: -30, // Overlap the green background
     paddingHorizontal: 20,
+    backgroundColor: '#fff',
+    paddingBottom: 10,
   },
   
-  searchWrapper: { marginBottom: 20 },
+  
+  searchWrapper: { marginBottom: 15 },
   searchContainer: { 
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: '#fff', borderRadius: 25, height: 50, paddingHorizontal: 15,
@@ -305,19 +439,17 @@ const styles = StyleSheet.create({
   // Product Grid
   productCard: {
     flex: 1,
-    margin: 8, // from paddingHorizontal
-    backgroundColor: '#ffffff',
+    margin: 8,
+    backgroundColor: theme.paleGreen,
     borderRadius: 16,
     padding: 12,
-    borderWidth: 1,
-    borderColor: '#eee',
-    // To match 2 column layout precisely
+    borderWidth: 0,
     maxWidth: (width - 40 - 16) / 2, 
   },
   productImageWrapper: {
     width: '100%',
     aspectRatio: 1,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -331,9 +463,195 @@ const styles = StyleSheet.create({
   
   addBtn: {
     width: 28, height: 28,
-    borderRadius: 8, // squarish button as in reference
-    backgroundColor: '#008e42',
+    borderRadius: 8,
+    backgroundColor: theme.primary,
     alignItems: 'center',
     justifyContent: 'center',
-  }
+  },
+
+  // Category Tabs
+  categoryTabsWrapper: {
+    marginBottom: 20,
+    marginTop: 10,
+  },
+  categoryTabs: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  catTab: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  catTabActive: {
+    borderBottomColor: '#1a1d1e',
+  },
+  catTabText: {
+    fontSize: 13,
+    fontFamily: FontFamily.medium,
+    color: '#999',
+  },
+  catTabTextActive: {
+    color: '#1a1d1e',
+    fontFamily: FontFamily.bold,
+  },
+
+  // Bestsellers Section
+  bestsellersSection: {
+    marginBottom: 25,
+  },
+  bestsellersGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  bestsellersCard: {
+    width: '30%',
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  bestsellersImageWrapper: {
+    width: '100%',
+    aspectRatio: 1,
+    backgroundColor: theme.paleGreen,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  bestsellersImage: {
+    width: '60%',
+    height: '60%',
+    resizeMode: 'contain',
+  },
+  bestsellersName: {
+    fontSize: 12,
+    fontFamily: FontFamily.medium,
+    color: '#1a1d1e',
+    textAlign: 'center',
+  },
+
+  // Promo Section
+  promoSection: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    padding: 30,
+    alignItems: 'center',
+    marginBottom: 25,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  promoContent: {
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  promoIcon: {
+    marginBottom: 10,
+  },
+  promoTitle: {
+    fontSize: 20,
+    fontFamily: FontFamily.extraBold,
+    color: '#1a1d1e',
+    marginBottom: 5,
+  },
+  promoText: {
+    fontSize: 18,
+    fontFamily: FontFamily.bold,
+    color: '#555',
+    marginBottom: 10,
+  },
+  promoHeart: {
+    marginTop: 5,
+  },
+
+  // Category Products Section
+  categoriesProductsWrapper: {
+    marginTop: 10,
+  },
+  categoryProductSection: {
+    marginBottom: 30,
+    backgroundColor: '#f5f5f5',
+    paddingVertical: 15,
+  },
+  categoryProductHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 15,
+  },
+  categoryProductTitle: {
+    fontSize: 18,
+    fontFamily: FontFamily.bold,
+    color: '#1a1d1e',
+  },
+  seeMoreLink: {
+    fontSize: 12,
+    fontFamily: FontFamily.medium,
+    color: theme.primary,
+  },
+  categoryProductsScroll: {
+    paddingHorizontal: 20,
+  },
+  categoryProductCard: {
+    width: 120,
+    marginRight: 12,
+    backgroundColor: theme.paleGreen,
+    borderRadius: 12,
+    padding: 8,
+  },
+  categoryProductImageWrapper: {
+    width: '100%',
+    height: 100,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  categoryProductImage: {
+    width: '80%',
+    height: '80%',
+    resizeMode: 'contain',
+  },
+  categoryProductName: {
+    fontSize: 11,
+    fontFamily: FontFamily.medium,
+    color: '#1a1d1e',
+    marginBottom: 6,
+    lineHeight: 14,
+  },
+  categoryProductPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  categoryProductPrice: {
+    fontSize: 13,
+    fontFamily: FontFamily.bold,
+    color: theme.primary,
+  },
+  categoryProductOriginal: {
+    fontSize: 11,
+    fontFamily: FontFamily.medium,
+    color: '#999',
+    textDecorationLine: 'line-through',
+  },
+  seeAllCategoryBtn: {
+    marginHorizontal: 20,
+    marginTop: 15,
+    paddingVertical: 12,
+    backgroundColor: theme.lime,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  seeAllCategoryText: {
+    fontSize: 14,
+    fontFamily: FontFamily.bold,
+    color: theme.primary,
+  },
 });
