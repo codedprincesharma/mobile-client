@@ -16,7 +16,7 @@ export const fetchMe = async () => {
 };
 
 export const updateProfile = async (data: any) => {
-  const response = await api.put('/users/profile', data);
+  const response = await api.put('/auth/profile', data);
   return response.data;
 };
 
